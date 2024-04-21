@@ -58,6 +58,9 @@ const handleRequest = frames(async (ctx: any) => {
     }
   }
 
+  const installLink = 'https://warpcast.com/~/add-cast-action?url=' +
+    encodeURIComponent(getHostName() + '/action')
+
   return {
     image: (
       <div tw="flex flex-row w-full h-full">
@@ -74,7 +77,7 @@ const handleRequest = frames(async (ctx: any) => {
       <Button action="post" target={baseRoute}>
         View PFPs
       </Button>,
-      <Button action="post" target={baseRoute}>
+      <Button action="link" target={installLink}>
         Install Action
       </Button>,
     ],

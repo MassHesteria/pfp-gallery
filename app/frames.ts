@@ -1,6 +1,7 @@
 import { farcasterHubContext } from "frames.js/middleware";
 import { createFrames } from "frames.js/next";
 import { headers } from "next/headers";
+import { kv } from '@vercel/kv';
 
 //-------------------------------------------------------------------
 // Utility functions
@@ -21,6 +22,34 @@ const getHubRoute = (): string => {
     return 'https://nemes.farcaster.xyz:2281'
   }
   return 'http://localhost:3010/hub'
+}
+
+export type PFP = {
+  url: string;
+  fid: number;
+}
+
+export const getPFPs = async (fid: number) => {
+  let array: PFP[] = []
+  let images = await kv.lrange(`${fid}:images`, 0, -1)
+  let users = await kv.lrange<number>(`${fid}:users`, 0, -1)
+
+  if (images.length <= 0) {
+    return array
+  }
+  for (let i = 0; i < images.length; i++) {
+    array.push({
+      url: images[i],
+      fid: i < users.length ? users[i] : 0
+    })
+  }
+
+  return array
+}
+
+export const removePFP = async (fid: number, pfp: PFP) => {
+  await kv.lrem(`${fid}:images`, 0, pfp.url)
+  await kv.lrem(`${fid}:users`, 0, pfp.fid)
 }
 
 //-------------------------------------------------------------------

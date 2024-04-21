@@ -2,6 +2,7 @@
 import { NextRequest } from "next/server";
 import { frames } from "../frames";
 import { getUserDataForFid } from "frames.js";
+import { kv } from '@vercel/kv';
 
 type ActionResponse = {
   name: string; // An action name up to 30 characters.
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
     if (!ctx.message || !ctx.message.isValid) {
       throw new Error('Could not validate request')
     }
+    const requesterFid = ctx.message.castId?.requesterFid
     const fid = ctx.message.castId?.fid
     if (!fid) {
       throw new Error('Could not validate request')
@@ -40,7 +42,9 @@ export async function POST(req: NextRequest) {
     console.log(JSON.stringify(ctx))
     const userData = await getUserDataForFid({ fid })
     if (userData) {
-      message = `PFPG: ${userData.displayName}`
+      await kv.rpush(`${requesterFid}:bookmarks`, userData.profileImage)
+      await kv.rpush(`${requesterFid}:users`, fid)
+      message = `Added PFP for ${userData.displayName}`
     }
     return {
       image: <div></div>

@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
-import { State, frames, getHostName } from "../frames";
-import { kv } from '@vercel/kv';
+import { State, frames, getHostName, getPFPs, removePFP } from "../frames";
+import { getUserDataForFid } from "frames.js";
 
 const handleRequest = frames(async (ctx: any) => {
   const timestamp = `${Date.now()}`
@@ -14,7 +14,7 @@ const handleRequest = frames(async (ctx: any) => {
     }
     console.log(JSON.stringify(ctx))
     const fid = 373258
-    let values = await kv.lrange(`${fid}:bookmarks`, 0, -1)
+    let values = await getPFPs(fid)
     if (values.length <= 0) {
       return {
         image: (
@@ -32,17 +32,24 @@ const handleRequest = frames(async (ctx: any) => {
       if (ctx.pressedButton.index == 1) {
         state.index = (state.index + 1) % values.length
       } else if (ctx.pressedButton.index == 2) {
-        await kv.lrem(`${fid}:bookmarks`, 0, values[state.index])
-        values = await kv.lrange(`${fid}:bookmarks`, 0, -1)
+        await removePFP(fid, values[state.index])
+        values = await getPFPs(fid)
         state.index %= values.length
       }
       //console.log(ctx.pressedButton.index)
       //kv.set('user:more', msg)
     }
 
+    const pfp = values[state.index]
+    const userData = await getUserDataForFid({ fid: pfp.fid })
+    const profileLink = `https://warpcast.com`
+    let buttonText = userData?.displayName
+    if (!buttonText) {
+      buttonText = 'No profile available'
+    }
 
     return {
-      image: values[state.index],
+      image: pfp.url,
       imageOptions: {
         aspectRatio: '1:1',
       },
@@ -52,6 +59,9 @@ const handleRequest = frames(async (ctx: any) => {
         </Button>,
         <Button action="post" target={baseRoute}>
           Remove ❌
+        </Button>,
+        <Button action="link" target={profileLink}>
+          {buttonText}
         </Button>,
       ],
       state

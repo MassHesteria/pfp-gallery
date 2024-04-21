@@ -12,7 +12,7 @@ const handleRequest = frames(async (ctx: any) => {
     if (!ctx.message.isValid) {
       throw new Error('Could not validate request')
     }
-    
+    console.log(JSON.stringify(ctx))
     const fid = 373258
     let values = await kv.lrange(`${fid}:bookmarks`, 0, -1)
     if (values.length <= 0) {
@@ -60,13 +60,22 @@ const handleRequest = frames(async (ctx: any) => {
 
   return {
     image: (
-      <div>
-        View
+      <div tw="flex flex-row w-full h-full">
+        <div tw="flex flex-col m-auto w-5/6">
+          <div tw="flex mx-auto text-5xl">PFPs == Art</div>
+          <div tw="flex flex-col text-red-700 mt-3 text-center">
+            <span tw="mx-auto">The <u tw="mx-2">Save PFP to Gallery</u>action allows you to</span>
+            <span tw="mx-auto">view your favorite PFPs in this frame</span>
+          </div>
+        </div>
       </div>
     ),
     buttons: [
       <Button action="post" target={baseRoute}>
-        Click
+        View PFPs
+      </Button>,
+      <Button action="post" target={baseRoute}>
+        Install Action
       </Button>,
     ],
   };

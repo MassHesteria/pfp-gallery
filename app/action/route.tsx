@@ -41,6 +41,20 @@ export async function POST(req: NextRequest) {
     console.log(JSON.stringify(ctx))
     const userData = await getUserDataForFid({ fid })
     if (userData && userData.profileImage) {
+      const res = await fetch(userData.profileImage)
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch image')
+      }
+
+      const blob = await res.blob()
+      const contentType = blob.type
+      console.log('contentType:',contentType)
+      if (contentType.toLowerCase().includes('svg')) {
+        message = 'Unsupported image type'
+        throw new Error(message)
+      }
+
       await addPFP(requesterFid, { url: userData.profileImage, fid })
       message = `Added PFP for ${userData.displayName}`
     }

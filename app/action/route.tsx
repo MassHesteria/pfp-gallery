@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { NextRequest } from "next/server";
 import { frames } from "../frames";
+import { getUserDataForFid } from "frames.js";
 
 type ActionResponse = {
   name: string; // An action name up to 30 characters.
@@ -32,8 +33,15 @@ export async function POST(req: NextRequest) {
     if (!ctx.message || !ctx.message.isValid) {
       throw new Error('Could not validate request')
     }
+    const fid = ctx.message.castId?.fid
+    if (!fid) {
+      throw new Error('Could not validate request')
+    }
     console.log(JSON.stringify(ctx))
-    message = `PFPG: ${ctx.message.castId?.fid}`
+    const userData = await getUserDataForFid({ fid })
+    if (userData) {
+      message = `PFPG: ${userData.displayName}`
+    }
     return {
       image: <div></div>
     }

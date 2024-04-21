@@ -1,8 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { NextRequest } from "next/server";
-import { frames } from "../frames";
+import { addPFP, frames } from "../frames";
 import { getUserDataForFid } from "frames.js";
-import { kv } from '@vercel/kv';
 
 type ActionResponse = {
   name: string; // An action name up to 30 characters.
@@ -41,9 +40,8 @@ export async function POST(req: NextRequest) {
     }
     console.log(JSON.stringify(ctx))
     const userData = await getUserDataForFid({ fid })
-    if (userData) {
-      await kv.rpush(`${requesterFid}:bookmarks`, userData.profileImage)
-      await kv.rpush(`${requesterFid}:users`, fid)
+    if (userData && userData.profileImage) {
+      await addPFP(requesterFid, { url: userData.profileImage, fid })
       message = `Added PFP for ${userData.displayName}`
     }
     return {

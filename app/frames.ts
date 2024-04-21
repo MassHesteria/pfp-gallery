@@ -29,6 +29,11 @@ export type PFP = {
   fid: number;
 }
 
+export const addPFP = async (fid: number, pfp: PFP) => {
+  await kv.rpush(`${fid}:images`, pfp.url)
+  await kv.rpush(`${fid}:users`, pfp.fid)
+}
+
 export const getPFPs = async (fid: number) => {
   let array: PFP[] = []
   let images = await kv.lrange(`${fid}:images`, 0, -1)

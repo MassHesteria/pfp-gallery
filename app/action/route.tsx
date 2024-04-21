@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
     if (!ctx.message || !ctx.message.isValid) {
       throw new Error('Could not validate request')
     }
-    const requesterFid = ctx.message.castId?.requesterFid
+    const requesterFid = ctx.message.requesterFid
     const fid = ctx.message.castId?.fid
-    if (!fid) {
+    if (!fid || !requesterFid) {
       throw new Error('Could not validate request')
     }
     console.log(JSON.stringify(ctx))

@@ -51,12 +51,11 @@ export async function POST(req: NextRequest) {
       const contentType = blob.type
       console.log('contentType:',contentType)
       if (contentType.toLowerCase().includes('svg')) {
-        message = 'Unsupported image type'
-        throw new Error(message)
+        message = `Invalid: ${contentType}`
+      } else {
+        await addPFP(requesterFid, { url: userData.profileImage, fid })
+        message = `Added PFP for ${userData.displayName}`
       }
-
-      await addPFP(requesterFid, { url: userData.profileImage, fid })
-      message = `Added PFP for ${userData.displayName}`
     }
     return {
       image: <div></div>

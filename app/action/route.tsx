@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
       const res = await fetch(userData.profileImage)
 
       if (!res.ok) {
-        throw new Error('Failed to fetch image')
+        message = 'Failed image fetch'
+        return {
+          image: <div></div>
+        }
       }
 
       const blob = await res.blob()

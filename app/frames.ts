@@ -63,6 +63,7 @@ export const removePFP = async (fid: number, pfp: PFP) => {
 
 export type State = {
   index: number;
+  manage: boolean;
 }
  
 export const frames = createFrames<State>({
@@ -71,5 +72,6 @@ export const frames = createFrames<State>({
   })],
   initialState: {
     index: 0,
+    manage: false
   }
 });

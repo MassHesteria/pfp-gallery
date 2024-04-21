@@ -48,6 +48,28 @@ const handleRequest = frames(async (ctx: any) => {
       buttonText = 'No profile available'
     }
 
+    // Show remove button for manage mode
+    if (state.manage) {
+      return {
+        image: pfp.url,
+        imageOptions: {
+          aspectRatio: '1:1',
+        },
+        buttons: [
+          <Button action="post" target={baseRoute}>
+            Next ⏭
+          </Button>,
+          <Button action="post" target={baseRoute}>
+            Remove ❌
+          </Button>,
+          <Button action="link" target={profileLink}>
+            {buttonText}
+          </Button>,
+        ],
+        state
+      }
+    }
+
     return {
       image: pfp.url,
       imageOptions: {
@@ -56,9 +78,6 @@ const handleRequest = frames(async (ctx: any) => {
       buttons: [
         <Button action="post" target={baseRoute}>
           Next ⏭
-        </Button>,
-        <Button action="post" target={baseRoute}>
-          Remove ❌
         </Button>,
         <Button action="link" target={profileLink}>
           {buttonText}
